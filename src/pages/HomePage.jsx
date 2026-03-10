@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
-// Swiper CSS is imported HERE (inside the lazy-loaded page chunk)
-// so other pages never download it
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -20,7 +18,6 @@ const heroSlides = [
     description: 'Experience the thrill of high-performance RC vehicles built for champions',
     cta: 'Shop RC Cars',
     link: '/products?category=remote-control-cars',
-    // Added auto=format&fit=crop for Unsplash CDN compression
     img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=75&auto=format&fit=crop',
     accent: '#f59300'
   },
@@ -44,28 +41,39 @@ const heroSlides = [
   }
 ];
 
-const categoryCards = [
-  { name: 'Toy Cars',    slug: 'toy-cars',               icon: '🚗', color: 'from-red-500/20 to-orange-500/20 border-red-500/20' },
-  { name: 'RC Cars',     slug: 'remote-control-cars',     icon: '🎮', color: 'from-blue-500/20 to-cyan-500/20 border-blue-500/20' },
-  { name: 'Toy Bikes',   slug: 'toy-bikes',               icon: '🏍️', color: 'from-green-500/20 to-emerald-500/20 border-green-500/20' },
-  { name: 'Electronics', slug: 'small-electronics',       icon: '📱', color: 'from-purple-500/20 to-pink-500/20 border-purple-500/20' },
-  { name: 'Gadgets',     slug: 'gadgets',                 icon: '⚡', color: 'from-yellow-500/20 to-amber-500/20 border-yellow-500/20' },
-  { name: 'Batteries',   slug: 'batteries-accessories',   icon: '🔋', color: 'from-teal-500/20 to-cyan-500/20 border-teal-500/20' },
+// Fallback colors/icons if API doesn't return them
+const categoryStyles = [
+  'from-red-500/20 to-orange-500/20 border-red-500/20',
+  'from-blue-500/20 to-cyan-500/20 border-blue-500/20',
+  'from-green-500/20 to-emerald-500/20 border-green-500/20',
+  'from-purple-500/20 to-pink-500/20 border-purple-500/20',
+  'from-yellow-500/20 to-amber-500/20 border-yellow-500/20',
+  'from-teal-500/20 to-cyan-500/20 border-teal-500/20',
 ];
 
-// Reusable fade-up animation — defined once, not inline per element
+const categoryIcons = ['🚗', '🎮', '🏍️', '📱', '⚡', '🔋'];
+
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 export default function HomePage() {
   const [featured, setFeatured] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch featured products
     api.get('/products/featured')
-      .then(r => setFeatured(r.data.products))
+      .then(r => setFeatured(r.data?.products ?? r.data ?? []))
       .catch(() => {})
       .finally(() => setLoadingFeatured(false));
+
+    // Fetch categories from API
+    api.get('/categories')
+      .then(r => setCategories(r.data?.categories ?? r.data ?? []))
+      .catch(() => {})
+      .finally(() => setLoadingCategories(false));
   }, []);
 
   return (
@@ -85,7 +93,6 @@ export default function HomePage() {
           {heroSlides.map((slide, i) => (
             <SwiperSlide key={i}>
               <div className="relative h-full">
-                {/* fetchpriority=high on first slide image — browser loads it ASAP */}
                 <img
                   src={slide.img}
                   alt={slide.title}
@@ -155,28 +162,40 @@ export default function HomePage() {
           <span className="text-primary-400 font-medium text-sm tracking-widest uppercase">Browse By</span>
           <h2 className="font-display text-3xl md:text-4xl font-bold mt-2 text-white">Shop Categories</h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categoryCards.map((cat, i) => (
-            // Animate only the section heading, not every individual card
-            // whileInView on 6 items is fine; avoid it on 20+ product cards
-            <motion.div
-              key={cat.slug}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <Link
-                to={`/products?category=${cat.slug}`}
-                className={`flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br ${cat.color} border hover:scale-105 transition-transform cursor-pointer`}
+
+        {loadingCategories ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-24 rounded-2xl bg-dark-700 animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {categories.map((cat, i) => (
+              <motion.div
+                key={cat._id ?? cat.slug ?? i}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
               >
-                <span className="text-4xl">{cat.icon}</span>
-                <span className="text-sm font-semibold text-white text-center">{cat.name}</span>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+                <Link
+                  to={`/products?category=${cat.slug ?? cat._id}`}
+                  className={`flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br ${categoryStyles[i % categoryStyles.length]} border hover:scale-105 transition-transform cursor-pointer`}
+                >
+                  {/* Use image from API if available, else fallback icon */}
+                  {cat.image ? (
+                    <img src={cat.image} alt={cat.name} className="w-10 h-10 object-contain" />
+                  ) : (
+                    <span className="text-4xl">{cat.icon ?? categoryIcons[i % categoryIcons.length]}</span>
+                  )}
+                  <span className="text-sm font-semibold text-white text-center">{cat.name}</span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ── Featured Products ── */}
@@ -198,7 +217,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             {[...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
           </div>
-        ) : (
+        ) : featured.length > 0 ? (
           <Swiper
             modules={[Navigation]}
             slidesPerView={2}
@@ -216,6 +235,8 @@ export default function HomePage() {
               </SwiperSlide>
             ))}
           </Swiper>
+        ) : (
+          <p className="text-center text-gray-400 py-12">No featured products available.</p>
         )}
       </section>
 

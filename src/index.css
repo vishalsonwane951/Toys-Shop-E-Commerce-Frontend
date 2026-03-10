@@ -22,7 +22,7 @@
     @apply w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-colors;
   }
   .btn-primary {
-    @apply bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold rounded-2xl transition-colors cursor-pointer;
+    @apply color-orange bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold rounded-2xl transition-colors cursor-pointer;
   }
 }
 

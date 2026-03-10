@@ -52,8 +52,8 @@ export default function ProductsPage() {
   // Fetch categories once
   useEffect(() => {
     api.get('/categories')
-      .then(r => setCategories(r.data.categories))
-      .catch(() => {});
+      .then(r => setCategories(r.data?.categories || []))
+      .catch(() => setCategories([]));
   }, []);
 
   // Fetch products — depends on debounced search so no call per keystroke
@@ -72,10 +72,15 @@ export default function ProductsPage() {
           if (cat) params.category = cat._id;
         }
         const { data } = await api.get('/products', { params });
-        setProducts(data.products);
-        setPagination({ page: data.page, pages: data.pages, total: data.total });
+        setProducts(data?.products || []);
+        setPagination({
+          page:  data?.page  || 1,
+          pages: data?.pages || 1,
+          total: data?.total || 0,
+        });
       } catch (err) {
         console.error(err);
+        setProducts([]);
       } finally {
         setLoading(false);
       }

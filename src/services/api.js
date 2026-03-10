@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api', withCredentials: true });
+// Uses VITE_API_URL in production (set in Netlify env vars)
+// Falls back to /api proxy for local dev
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  withCredentials: true,
+});
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -14,6 +19,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('tokenVerified');
       window.location.href = '/login';
     }
     return Promise.reject(err);

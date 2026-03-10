@@ -1,7 +1,7 @@
-const User = require('../models/User');
-const Product = require('../models/Product');
+import User from "../models/User.js";
+import Product from "../models/Product.js";
 
-exports.getWishlist = async (req, res) => {
+export const getWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate('wishlist');
     res.json(user.wishlist);
@@ -10,7 +10,7 @@ exports.getWishlist = async (req, res) => {
   }
 };
 
-exports.toggleWishlist = async (req, res) => {
+export const toggleWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const productId = req.params.productId;

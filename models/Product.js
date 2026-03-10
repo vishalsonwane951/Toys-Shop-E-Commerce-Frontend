@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 
 const reviewSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -38,4 +39,4 @@ productSchema.methods.calculateRating = function() {
   }
 };
 
-module.exports = mongoose.model('Product', productSchema);
+export default mongoose.model("Product", productSchema);

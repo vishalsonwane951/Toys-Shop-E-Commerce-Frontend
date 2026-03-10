@@ -1,8 +1,10 @@
-const router = require('express').Router();
-const ctrl = require('../controllers/wishlistController');
-const { protect } = require('../middleware/auth');
+import express from "express";
+import { getWishlist, toggleWishlist } from "../controllers/wishlistController.js";
+import { protect } from "../middleware/auth.js";
 
-router.get('/', protect, ctrl.getWishlist);
-router.put('/:productId', protect, ctrl.toggleWishlist);
+const router = express.Router();
 
-module.exports = router;
+router.get("/", protect, getWishlist);
+router.put("/:productId", protect, toggleWishlist);
+
+export default router;

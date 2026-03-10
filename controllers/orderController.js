@@ -1,7 +1,8 @@
-const Order = require('../models/Order');
-const Product = require('../models/Product');
+import Order from "../models/Order.js";
+import Product from "../models/Product.js";
+import User from "../models/User.js";
 
-exports.createOrder = async (req, res) => {
+export const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod, itemsPrice, shippingPrice, taxPrice, totalPrice } = req.body;
     if (!orderItems || orderItems.length === 0) {
@@ -21,7 +22,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-exports.getMyOrders = async (req, res) => {
+export const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).sort('-createdAt');
     res.json({ success: true, orders });
@@ -30,7 +31,7 @@ exports.getMyOrders = async (req, res) => {
   }
 };
 
-exports.getOrder = async (req, res) => {
+export const getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate('user', 'name email').populate('orderItems.product', 'name images');
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
@@ -43,7 +44,7 @@ exports.getOrder = async (req, res) => {
   }
 };
 
-exports.getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
@@ -56,7 +57,7 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-exports.updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
     res.json({ success: true, order });
@@ -65,14 +66,14 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-exports.getStats = async (req, res) => {
+export const getStats = async (req, res) => {
   try {
     const totalOrders = await Order.countDocuments();
     const totalRevenue = await Order.aggregate([{ $group: { _id: null, total: { $sum: '$totalPrice' } } }]);
     const pendingOrders = await Order.countDocuments({ status: 'pending' });
     const recentOrders = await Order.find().populate('user', 'name').sort('-createdAt').limit(5);
-    const Product = require('../models/Product');
-    const User = require('../models/User');
+    // const Product = require('../models/Product');
+    // const User = require('../models/User');
     const totalProducts = await Product.countDocuments({ isActive: true });
     const totalUsers = await User.countDocuments({ role: 'user' });
     const monthlySales = await Order.aggregate([

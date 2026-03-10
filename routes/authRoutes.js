@@ -1,7 +1,8 @@
-const express = require('express');
+import express from "express";
+import { register, login, getMe, updateProfile, addToWishlist } from "../controllers/authController.js";
+import { protect } from "../middleware/auth.js";
+
 const router = express.Router();
-const { register, login, getMe, updateProfile, addToWishlist } = require('../controllers/authController');
-const { protect } = require('../middleware/auth');
 
 router.post('/register', register);
 router.post('/login', login);
@@ -9,4 +10,4 @@ router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 router.put('/wishlist/:productId', protect, addToWishlist);
 
-module.exports = router;
+export default router;

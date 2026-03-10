@@ -1,12 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const { getCategories, createCategory, updateCategory, deleteCategory } = require('../controllers/categoryController');
-const { protect, adminOnly } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+import express from "express";
+import { getCategories, createCategory, updateCategory, deleteCategory } from "../controllers/categoryController.js";
+import { protect, adminOnly } from "../middleware/auth.js";
+import upload from "../middleware/upload.js";
 
+const router = express.Router();
 router.get('/', getCategories);
 router.post('/', protect, adminOnly, upload.single('image'), createCategory);
 router.put('/:id', protect, adminOnly, upload.single('image'), updateCategory);
 router.delete('/:id', protect, adminOnly, deleteCategory);
 
-module.exports = router;
+export default router;

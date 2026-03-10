@@ -1,6 +1,6 @@
-const Product = require('../models/Product');
+import Product from "../models/Product.js";
 
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
@@ -33,7 +33,7 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-exports.getFeaturedProducts = async (req, res) => {
+export const getFeaturedProducts = async (req, res) => {
   try {
     const products = await Product.find({ isFeatured: true, isActive: true })
       .populate('category', 'name slug')
@@ -44,7 +44,7 @@ exports.getFeaturedProducts = async (req, res) => {
   }
 };
 
-exports.getProduct = async (req, res) => {
+export const getProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
       .populate('category', 'name slug')
@@ -56,7 +56,7 @@ exports.getProduct = async (req, res) => {
   }
 };
 
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
     if (req.body.existingImages) {
@@ -73,7 +73,7 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     let updateData = { ...req.body };
     if (req.files && req.files.length > 0) {
@@ -87,7 +87,7 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, { isActive: false });
     res.json({ success: true, message: 'Product deleted' });
@@ -96,7 +96,7 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
-exports.addReview = async (req, res) => {
+export const addReview = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });

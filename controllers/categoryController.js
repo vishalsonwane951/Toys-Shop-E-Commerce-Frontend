@@ -1,6 +1,6 @@
-const Category = require('../models/Category');
+import Category from '../models/Category.js';
 
-exports.getCategories = async (req, res) => {
+export const getCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true });
     res.json({ success: true, categories });
@@ -9,7 +9,7 @@ exports.getCategories = async (req, res) => {
   }
 };
 
-exports.createCategory = async (req, res) => {
+export const createCategory = async (req, res) => {
   try {
     const image = req.file ? `/uploads/${req.file.filename}` : '';
     const slug = req.body.name.toLowerCase().replace(/\s+/g, '-');
@@ -20,7 +20,7 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-exports.updateCategory = async (req, res) => {
+export const updateCategory = async (req, res) => {
   try {
     const updateData = { ...req.body };
     if (req.file) updateData.image = `/uploads/${req.file.filename}`;
@@ -32,7 +32,7 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
-exports.deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res) => {
   try {
     await Category.findByIdAndUpdate(req.params.id, { isActive: false });
     res.json({ success: true, message: 'Category deleted' });

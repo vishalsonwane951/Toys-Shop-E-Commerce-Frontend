@@ -1,11 +1,12 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import Category from "../models/Category.js";
+import Product from "../models/Product.js";
 
-const User = require('../models/User');
-const Category = require('../models/Category');
-const Product = require('../models/Product');
+dotenv.config();
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/toyshop';
+const MONGO_URI = process.env.MONGODB_URI;
 
 const categories = [
   { name: 'Toy Cars', slug: 'toy-cars', icon: '🚗', description: 'Die-cast and plastic toy cars for all ages' },

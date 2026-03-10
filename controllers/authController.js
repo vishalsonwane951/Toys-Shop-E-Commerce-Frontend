@@ -1,11 +1,11 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken'
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
 };
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existing = await User.findOne({ email });
@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
@@ -32,11 +32,11 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
   res.json({ success: true, user: req.user });
 };
 
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const { name, phone, address } = req.body;
     const user = await User.findByIdAndUpdate(req.user._id, { name, phone, address }, { new: true });
@@ -46,7 +46,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-exports.addToWishlist = async (req, res) => {
+export const addToWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const productId = req.params.productId;
